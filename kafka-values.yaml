@@ -1,0 +1,26 @@
+replicaCount: 1
+
+auth:
+  clientProtocol: sasl
+  sasl:
+    mechanism: plain
+  jaas:
+    clientUsers:
+      - user1  # values.yaml
+    clientPasswords:
+      - your_pasword  # your_pasword
+
+externalAccess:
+  enabled: false  
+
+persistence:
+  enabled: true
+  size: 10Gi
+
+autoCreateTopicsEnable: true
+
+
+topics:
+  - name: opensky
+    partitions: 3
+    replicationFactor: 1

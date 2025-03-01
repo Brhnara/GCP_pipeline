@@ -1,0 +1,39 @@
+image:
+  repository: gcr.io/flight-streaming-project/opensky-producer
+  tag: latest
+  pullPolicy: Always
+
+replicaCount: 1
+
+env:
+  - name: KAFKA_TOPIC
+    value: "opensky"
+  - name: KAFKA_BROKER
+    value: "kafka.kafka.svc.cluster.local:9092"
+  - name: KAFKA_USERNAME
+    value: "user1"
+  - name: KAFKA_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: kafka-user-passwords
+        key: client-passwords  
+  - name: USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: opensky-credentials
+        key: username
+  - name: PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: opensky-credentials
+        key: password
+  - name: CHUNK_SIZE
+    value: "100"      
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "200m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"

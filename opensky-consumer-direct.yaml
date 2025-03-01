@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensky-consumer
+  labels:
+    app: opensky-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensky-consumer
+  template:
+    metadata:
+      labels:
+        app: opensky-consumer
+    spec:
+      containers:
+        - name: opensky-consumer
+          image: gcr.io/flight-streaming-project/opensky-consumer:latest
+          imagePullPolicy: Always
+          env:
+            - name: KAFKA_TOPIC
+              value: "opensky"
+            - name: KAFKA_BROKER
+              value: "kafka.kafka.svc.cluster.local:9092"
+            - name: KAFKA_USERNAME
+              value: "user1"
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-user-passwords
+                  key: client-passwords
+            - name: BIGQUERY_PROJECT
+              value: "flight-streaming-project"
+            - name: BIGQUERY_DATASET
+              value: "opensky_dataset"
+            - name: BIGQUERY_TABLE
+              value: "flights"
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/var/secrets/google/key.json"
+          volumeMounts:
+            - name: google-cloud-key
+              mountPath: /var/secrets/google
+              readOnly: true
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: google-cloud-key
+          secret:
+            secretName: bigquery-sa-key
